@@ -6,7 +6,8 @@ A simple implementation of the [olfactory search problem](https://github.com/C0P
 
 ```bash
 git clone https://github.com/kevinmcareavey/olfactory-search.git
-python3 -m pip install olfactory-search
+cd olfactory-search
+python3 -m pip install .
 ```
 
 # Getting started
