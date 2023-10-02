@@ -17,7 +17,7 @@ import gymnasium
 import olfactory_search
 
 seed = 2
-env = gymnasium.make('olfactory_search/OTTO-v0', grid_size=19)
+env = gymnasium.make("olfactory_search/OTTO-v0", grid_size=19, h_max=2)
 
 observation, info = env.reset(seed=seed)
 print(f"initial observation = {observation}, info = {info}")
