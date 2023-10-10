@@ -78,7 +78,7 @@ class Isotropic2D(gym.Env):
         if np.array_equal(self._state["agent"], self._state["source"]):
             hits = -1
         else:
-            r = np.linalg.norm(self._state["source"] - self._state["agent"])
+            r = np.linalg.norm(self._state["source"] - self._state["agent"])  # Euclidean distance
             mu_r = (scipy.special.k0(r / self.parameters.lambda_over_delta_x) / scipy.special.k0(1)) * self.parameters.mu0_Poisson
             # weights = ((mu_r ** self.parameters.h) * np.exp(-mu_r)) / scipy.special.factorial(self.parameters.h)  # should be same as scipy.stats.poisson.pmf
             weights = scipy.stats.poisson.pmf(self.parameters.h, mu_r)
@@ -86,11 +86,11 @@ class Isotropic2D(gym.Env):
             hits = self.np_random.choice(self.parameters.h, p=probabilities)
         return {"agent": self._state["agent"], "hits": hits}
 
-    def _info(self):
+    def _info(self):  # this should not be exposed to agent
         return {"source": self._state["source"]}
 
     def reset(self, seed=None, options=None):
-        super().reset(seed=seed)
+        super().reset(seed=seed)  # as per official example https://gymnasium.farama.org/tutorials/gymnasium_basics/environment_creation/#reset
 
         agent_location = self.np_random.integers(0, self.parameters.grid_size, size=2, dtype=np.int64)
 
@@ -108,14 +108,12 @@ class Isotropic2D(gym.Env):
     def step(self, action):
         direction = self._action_to_direction[action]
 
-        # We use `np.clip` to make sure we don't leave the grid
-        self._state["agent"] = np.clip(self._state["agent"] + direction, 0, self.parameters.grid_size - 1)
+        self._state["agent"] = np.clip(self._state["agent"] + direction, 0, self.parameters.grid_size - 1)  # ensure agent remains within the grid
 
-        # An episode is done iff the agent has reached the source
-        terminated = np.array_equal(self._state["agent"], self._state["source"])
+        terminated = np.array_equal(self._state["agent"], self._state["source"])  # episode terminates if agent reaches the source
         truncated = False  # use gymnasium.make([...[, max_episode_steps=Parameters.T_max) to handle episode truncation
         observation = self._observation()
-        reward = 0 if observation["hits"] == -1 else -1  # Binary sparse rewards
+        reward = 0 if observation["hits"] == -1 else -1  # binary sparse rewards
         info = self._info()
 
         return observation, reward, terminated, truncated, info
