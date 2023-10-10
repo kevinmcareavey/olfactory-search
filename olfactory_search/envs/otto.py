@@ -69,7 +69,7 @@ class Isotropic2D(gym.Env):
             0: np.array([1, 0]),  # right
             1: np.array([0, 1]),  # up
             2: np.array([-1, 0]),  # left
-            3: np.array([0, -1]),  # right
+            3: np.array([0, -1]),  # down
         }
 
         self._state = None
