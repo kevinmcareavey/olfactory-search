@@ -1,1 +1,1 @@
-from olfactory_search.envs.otto import OTTOEnv
+from olfactory_search.envs.otto import Isotropic2D, SMALLER_DOMAIN, LARGER_DOMAIN

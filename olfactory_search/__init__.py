@@ -1,6 +1,6 @@
 from gymnasium.envs.registration import register
 
 register(
-     id="olfactory_search/OTTO-v0",
-     entry_point="olfactory_search.envs:OTTOEnv",
+     id="olfactory_search/Isotropic2D-v0",
+     entry_point="olfactory_search.envs:Isotropic2D",
 )

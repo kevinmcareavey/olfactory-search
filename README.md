@@ -14,10 +14,11 @@ python3 -m pip install .
 
 ```python
 import gymnasium
-import olfactory_search
+from olfactory_search.envs import SMALLER_DOMAIN, LARGER_DOMAIN
 
-seed = 2
-env = gymnasium.make("olfactory_search/OTTO-v0", grid_size=19, h_max=2)
+seed = 0
+parameters = SMALLER_DOMAIN
+env = gymnasium.make("olfactory_search/Isotropic2D-v0", parameters=parameters, max_episode_steps=parameters.T_max)
 
 observation, info = env.reset(seed=seed)
 print(f"initial observation = {observation}, info = {info}")
@@ -27,9 +28,10 @@ for _ in range(1000):
     print(f"action = {action}, observation = {observation}, reward = {reward}, done = {terminated or truncated}, info = {info}")
 
     if terminated or truncated:
+        print(f"episode done")
         observation, info = env.reset(seed=seed)
-        print(f"\ninitial observation = {observation}")
+        print(f"\ninitial observation = {observation}, info = {info}")
 
-print("simulation complete")
+print("simulation done")
 env.close()
 ```
