@@ -16,7 +16,7 @@ python3 -m pip install .
 import gymnasium
 from olfactory_search.envs import SMALLER_DOMAIN, LARGER_DOMAIN
 
-seed = 0
+seed = None  # if seed is not None then episodes will always start in the same initial state
 parameters = SMALLER_DOMAIN
 env = gymnasium.make("olfactory_search/Isotropic2D-v0", parameters=parameters, max_episode_steps=parameters.T_max)
 

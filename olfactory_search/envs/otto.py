@@ -56,7 +56,7 @@ class Isotropic2D(gym.Env):
         if np.array_equal(self._state["agent"], self._state["source"]):
             hits = -1
         else:
-            r = np.linalg.norm(self._state["source"] - self._state["agent"])
+            r = np.linalg.norm(self._state["source"] - self._state["agent"]) # Euclidean distance
             mu_r = (
                 scipy.special.k0(r / self.parameters.lambda_over_delta_x)
                 / scipy.special.k0(1)
@@ -67,13 +67,13 @@ class Isotropic2D(gym.Env):
             hits = self.np_random.choice(self.parameters.h, p=probabilities)
         return {"agent": self._state["agent"], "hits": hits}
 
-    def _info(self):
+    def _info(self):  # this should not be exposed to agent
         return {"source": self._state["source"]}
 
     def reset(
         self, *, seed: int | None = None, options: dict[str, Any] | None = None
     ) -> tuple[Any, dict[str, Any]]:
-        super().reset(seed=seed)
+        super().reset(seed=seed) # as per official example https://gymnasium.farama.org/tutorials/gymnasium_basics/environment_creation/#reset
 
         if options is not None and "agent_location" in options:
             assert len(options["agent_location"]) == 2
@@ -412,13 +412,12 @@ class Windy3D(gym.Env):
         # We use `np.clip` to make sure we don't leave the grid
         self._state["agent"] = np.clip(
             self._state["agent"] + direction, 0, self.parameters.grid_size - 1
-        )
+        ) # ensure agent remains within the grid
 
-        # An episode is done iff the agent has reached the source
-        terminated = np.array_equal(self._state["agent"], self._state["source"])
+        terminated = np.array_equal(self._state["agent"], self._state["source"])  # episode terminates if agent reaches the source
         truncated = False  # use gymnasium.make([...[, max_episode_steps=Parameters.T_max) to handle episode truncation
         observation = self._observation()
-        reward = 0 if observation["hits"] == -1 else -1  # Binary sparse rewards
+        reward = 0 if observation["hits"] == -1 else -1  # binary sparse rewards
         info = self._info()
 
         return observation, reward, terminated, truncated, info
