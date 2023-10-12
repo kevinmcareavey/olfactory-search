@@ -14,13 +14,19 @@ python3 -m pip install .
 
 ```python
 import gymnasium
-from olfactory_search.envs import SMALLER_DOMAIN, LARGER_DOMAIN
+from olfactory_search.envs import SMALLER_ISOTROPIC_DOMAIN, SMALLER_WINDY_DOMAIN
 
-seed = None  # if seed is not None then episodes will always start in the same initial state
-parameters = SMALLER_DOMAIN
-env = gymnasium.make("olfactory_search/Isotropic2D-v0", parameters=parameters, max_episode_steps=parameters.T_max)
+seed = None # if seed is not None then episodes will always start in the same initial state
+parameters = SMALLER_WINDY_DOMAIN
+env = gymnasium.make("olfactory_search/Windy2D-v0", parameters=parameters, max_episode_steps=parameters.T_max)
 
-observation, info = env.reset(seed=seed)
+# Uncomment the following if you specify the original location
+# options = {
+#     'agent_location': [4, 2],
+#     'source_location': [2, 4],
+# }
+options = None
+observation, info = env.reset(seed=seed, options=options)
 print(f"initial observation = {observation}, info = {info}")
 for _ in range(1000):
     action = env.action_space.sample()
@@ -29,7 +35,7 @@ for _ in range(1000):
 
     if terminated or truncated:
         print(f"episode done")
-        observation, info = env.reset(seed=seed)
+        observation, info = env.reset(seed=seed, options=options)
         print(f"\ninitial observation = {observation}, info = {info}")
 
 print("simulation done")
