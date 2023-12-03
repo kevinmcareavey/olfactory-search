@@ -1,3 +1,9 @@
+"""
+    Reference: 
+     - Paper: https://link.springer.com/article/10.1140/epje/s10189-023-00277-8
+     - Code: https://github.com/auroreloisy/otto-benchmark
+"""
+
 from abc import abstractmethod
 
 from .parameters import ParametersIsotropic, ParametersWindy
@@ -64,7 +70,7 @@ class OttoBase(gym.Env):
         source_location = self.np_random.integers(
             0, self.parameters.grid_size, size=2, dtype=np.int64
         )
-        
+
         if options is not None:
             if "agent_location" in options:
                 assert self.num_dimensions == len(options["agent_location"])
@@ -107,16 +113,18 @@ class OttoBase(gym.Env):
 
 
 class Isotropic2D(OttoBase):
-    def __init__(self, num_dimensions, parameters: ParametersIsotropic, render_mode=None):
+    def __init__(
+        self, num_dimensions, parameters: ParametersIsotropic, render_mode=None
+    ):
         super(Isotropic2D, self).__init__(num_dimensions, parameters, render_mode)
 
     def _observation(self):
         if np.array_equal(self._state["agent"], self._state["source"]):
             hits = -1
         else:
-            r = np.linalg.norm(
-                self._state["source"] - self._state["agent"]
-            )  # Euclidean distance
+            # Euclidean distance
+            r = np.linalg.norm(self._state["source"] - self._state["agent"])
+            # eq: B5
             mu_r = (
                 scipy.special.k0(r / self.parameters.lambda_over_delta_x)
                 / scipy.special.k0(1)
@@ -132,48 +140,22 @@ class Isotropic2D(OttoBase):
 
 
 class Isotropic3D(OttoBase):
-    def __init__(self, num_dimensions , parameters: ParametersIsotropic, render_mode=None):
-        super(Isotropic3D, self).__init__(num_dimensions , parameters, render_mode)
+    def __init__(
+        self, num_dimensions, parameters: ParametersIsotropic, render_mode=None
+    ):
+        super(Isotropic3D, self).__init__(num_dimensions, parameters, render_mode)
 
     def _observation(self):
-        # 3D hit model
         if np.array_equal(self._state["agent"], self._state["source"]):
             hits = -1
         else:
+            # Euclidean distance
             r = np.linalg.norm(self._state["source"] - self._state["agent"])
+            # eq: A1b with V=0
             mu_r = (
-                self.parameters.lambda_over_delta_x
-                / r
-                * np.exp(-r / self.parameters.lambda_over_delta_x + 1)
-            ) * self.parameters.mu0_Poisson
-            weights = scipy.stats.poisson.pmf(self.parameters.h, mu_r)
-            probabilities = weights / np.sum(weights)
-            hits = self.np_random.choice(self.parameters.h, p=probabilities)
-        return {"agent": self._state["agent"], "hits": hits}
-
-    def _info(self):
-        return {"source": self._state["source"]}
-
-
-class Windy2D(OttoBase):
-    def __init__(self, num_dimensions , parameters: ParametersWindy, render_mode=None):
-        super(Windy2D, self).__init__(num_dimensions , parameters, render_mode)
-
-    def _observation(self):
-        # 2D windy model
-        # The wind blows in the positive x-direction
-        if np.array_equal(self._state["agent"], self._state["source"]):
-            hits = -1
-        else:
-            r = np.linalg.norm(self._state["source"] - self._state["agent"])
-            x_position = self._state["agent"][0] - self._state["source"][0]
-            mu_r = (
-                self.parameters.lambda_over_delta_x
-                / r
-                * np.exp(
-                    0.5 * self.parameters.V_times_delta_t * x_position
-                    - r / self.parameters.lambda_bar
-                )
+                (self.parameters.R_times_delta_t * self.parameters.delta_x_over_a)
+                / (2 * r)
+                * np.exp(-r / self.parameters.lambda_over_delta_x)
             )
             weights = scipy.stats.poisson.pmf(self.parameters.h, mu_r)
             probabilities = weights / np.sum(weights)
@@ -184,24 +166,24 @@ class Windy2D(OttoBase):
         return {"source": self._state["source"]}
 
 
-class Windy3D(OttoBase):
-    def __init__(self, num_dimensions , parameters: ParametersWindy, render_mode=None):
-        super(Windy3D, self).__init__(num_dimensions , parameters, render_mode)
+class Windy2D(OttoBase):
+    def __init__(self, num_dimensions, parameters: ParametersWindy, render_mode=None):
+        super(Windy2D, self).__init__(num_dimensions, parameters, render_mode)
 
     def _observation(self):
-        # 3D windy model
-        # The wind blows in the positive x-direction
+        # The wind blows in the positive x-direction from Section B2
         if np.array_equal(self._state["agent"], self._state["source"]):
             hits = -1
         else:
             r = np.linalg.norm(self._state["source"] - self._state["agent"])
+            # x_position is vector(r) * e_x
             x_position = self._state["agent"][0] - self._state["source"][0]
             mu_r = (
-                self.parameters.lambda_over_delta_x
+                self.parameters.R_bar
                 / r
                 * np.exp(
-                    0.5 * self.parameters.V_times_delta_t * x_position
-                    - r / self.parameters.lambda_bar
+                    self.parameters.V_bar * x_position / self.parameters.delta_x_over_a
+                    - r / self.parameters.lambda_over_a
                 )
             )
             weights = scipy.stats.poisson.pmf(self.parameters.h, mu_r)

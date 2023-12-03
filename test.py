@@ -1,8 +1,8 @@
 import gymnasium
-from olfactory_search.envs import SMALLER_ISOTROPIC_DOMAIN, SMALLER_WINDY_DOMAIN
+from olfactory_search.envs import SMALLER_ISOTROPIC_DOMAIN, SMALLER_WINDY_DOMAIN_WITH_DETECTION
 
 seed = None # if seed is not None then episodes will always start in the same initial state
-parameters = SMALLER_WINDY_DOMAIN
+parameters = SMALLER_WINDY_DOMAIN_WITH_DETECTION
 env = gymnasium.make("olfactory_search/Windy2D-v0", num_dimensions=2, parameters=parameters, max_episode_steps=parameters.T_max)
 
 # Uncomment the following if you specify the original location
