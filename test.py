@@ -1,24 +1,9 @@
-# olfactory-search
-
-A simple implementation of the [olfactory search problem](https://github.com/C0PEP0D/otto) as a [Gymnasium](https://github.com/Farama-Foundation/Gymnasium) environment.
-
-# Installation
-
-```bash
-git clone https://github.com/kevinmcareavey/olfactory-search.git
-cd olfactory-search
-python3 -m pip install .
-```
-
-# Getting started
-
-```python
 import gymnasium
-from olfactory_search.envs import SMALLER_ISOTROPIC_DOMAIN, SMALLER_WINDY_DOMAIN
+from olfactory_search.envs import SMALLER_ISOTROPIC_DOMAIN, SMALLER_WINDY_DOMAIN_WITH_DETECTION
 
 seed = None # if seed is not None then episodes will always start in the same initial state
-parameters = SMALLER_WINDY_DOMAIN
-env = gymnasium.make("olfactory_search/Windy2D-v0", parameters=parameters, max_episode_steps=parameters.T_max)
+parameters = SMALLER_WINDY_DOMAIN_WITH_DETECTION
+env = gymnasium.make("olfactory_search/Windy2D-v0", num_dimensions=2, parameters=parameters, max_episode_steps=parameters.T_max)
 
 # Uncomment the following if you specify the original location
 # options = {
@@ -40,4 +25,3 @@ for _ in range(1000):
 
 print("simulation done")
 env.close()
-```
